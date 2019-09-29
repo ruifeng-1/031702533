@@ -14,6 +14,7 @@ int main()
 	Address address;
 	cout << "please write name,number and address!" << endl;
 	cout << "enter END to exit." << endl;
+	setlocale(LC_CTYPE, "");
 	while (getline(wcin, s) && s != L"END")
 	{
 		s = text.select_level(s);
