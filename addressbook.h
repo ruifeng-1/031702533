@@ -15,6 +15,7 @@ public:
 	wstring find_number(wstring s);
 	void show();
 	wstring Level();
+	string transform(wstring s);
 private:
 	wstring name;//姓名
 	wstring number;//手机号码
@@ -38,7 +39,7 @@ wstring Text::select_level(wstring s)
 
 wstring Text::find_name(wstring s)
 {
-	wregex re(L"\\w+?[^\\,]");
+	wregex re(L"\\w+[^\\,]");
 	wsmatch sm;
 	if (regex_search(s, sm, re))//查找姓名
 	{
@@ -70,7 +71,19 @@ wstring Text::Level()
 
 void Text::show()//输出姓名，手机号码
 {
-	wcout << L"\"姓名\":\"" << name << L"\"," << "\r\n" << L"\"手机\":\"" << number << L"\"," << "\r\n";
+	wcout << L"{\"姓名\":\"" << name << L"\"," << L"\"手机\":\"" << number << L"\",";
+}
+
+string Text::transform(wstring s)
+{
+	setlocale(LC_CTYPE, "");
+	int iLen = wcstombs(NULL, s.c_str(), 0); // 计算转换后字符串的长度
+	char*lpsz = new char[iLen + 1];
+	int i = wcstombs(lpsz, s.c_str(), iLen); // 转换
+	lpsz[iLen] = '/0';
+	string s0(lpsz);
+	delete[]lpsz;
+	return s0;
 }
 
 class Address//地址类
@@ -81,6 +94,7 @@ public:
 	wstring search_address(wstring wstr, wregex wre);
 	bool match_address(wstring wstr, wregex wre);
 	void show(wstring diff);
+	string transform(wstring s);
 private:
 	wstring province;//省
 	wstring city;//市
@@ -98,7 +112,7 @@ void Address::find_address(wstring s)
 	wregex wre3(L"\\w+?(\\县|\\区)");
 	wregex wre4(L"\\w+?(\\街道|\\镇|\\乡)");
 	wregex wre5(L"\\w+?(\\路|\\街|\\巷)");
-	wregex wre6(L"\\d+?(\\号)");
+	wregex wre6(L".+?(\\号)");
 	wregex wre7(L".+[^\\.]");
 	wregex wre1_0(L"(\\北京|\\天津|\\上海|\\重庆)\\市?");
 
@@ -138,7 +152,19 @@ bool Address::match_address(wstring wstr, wregex wre)// 正则表达式匹配
 void Address::show(wstring diff)//输出地址
 {
 	if (diff == L"1!")
-		wcout << L"\"地址\":[\r\n\"" << province << L"\",\r\n\"" << city << L"\",\r\n\"" << county << L"\",\r\n\"" << town << L"\",\r\n\"" << road << house_number << detail << L"\"\r\n]" << endl;
+		wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << house_number << detail << L"\"]" << endl;
 	if (diff == L"2!")
-		wcout << L"\"地址\":[\r\n\"" << province << L"\",\r\n\"" << city << L"\",\r\n\"" << county << L"\",\r\n\"" << town << L"\",\r\n\"" << road << L"\",\r\n\"" << house_number << L"\",\r\n\"" << detail << L"\"\r\n]" << endl;
+		wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << L"\",\"" << house_number << L"\",\"" << detail << L"\"]" << endl;
+}
+
+string Address::transform(wstring s)
+{
+	setlocale(LC_CTYPE, "");
+	int iLen = wcstombs(NULL, s.c_str(), 0); // 计算转换后字符串的长度
+	char*lpsz = new char[iLen + 1];
+	int i = wcstombs(lpsz, s.c_str(), iLen); // 转换
+	lpsz[iLen] = '/0';
+	string s0(lpsz);
+	delete[]lpsz;
+	return s0;
 }
