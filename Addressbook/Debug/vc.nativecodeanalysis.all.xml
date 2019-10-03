@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>cpp_regex_traits.hpp</FILENAME>
+      <LINE>362</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::cpp_regex_traits_char_layer&lt;char&gt;::m_char_map' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::cpp_regex_traits_char_layer&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$cpp_regex_traits_char_layer@D@re_detail_107100@boost@@QAE@ABVlocale@std@@@Z</DECORATED>
+    <FUNCLINE>362</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>cpp_regex_traits.hpp</FILENAME>
+      <LINE>367</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::cpp_regex_traits_char_layer&lt;char&gt;::m_char_map' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::cpp_regex_traits_char_layer&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$cpp_regex_traits_char_layer@D@re_detail_107100@boost@@QAE@ABU?$cpp_regex_traits_base@D@12@@Z</DECORATED>
+    <FUNCLINE>367</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>w32_regex_traits.hpp</FILENAME>
+      <LINE>260</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::w32_regex_traits_char_layer&lt;char&gt;::m_type_map' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::w32_regex_traits_char_layer&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$w32_regex_traits_char_layer@D@re_detail_107100@boost@@QAE@I@Z</DECORATED>
+    <FUNCLINE>260</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>w32_regex_traits.hpp</FILENAME>
+      <LINE>133</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::w32_regex_traits_base&lt;char&gt;::m_locale' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::w32_regex_traits_base&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$w32_regex_traits_base@D@re_detail_107100@boost@@QAE@I@Z</DECORATED>
+    <FUNCLINE>133</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>cpp_regex_traits.hpp</FILENAME>
+      <LINE>176</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::cpp_regex_traits_base&lt;char&gt;::m_pctype' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::cpp_regex_traits_base&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$cpp_regex_traits_base@D@re_detail_107100@boost@@QAE@ABVlocale@std@@@Z</DECORATED>
+    <FUNCLINE>176</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>cpp_regex_traits.hpp</FILENAME>
+      <LINE>177</LINE>
+      <COLUMN>5</COLUMN>
+    </SFA>
+    <DEFECTCODE>26444</DEFECTCODE>
+    <DESCRIPTION>Avoid unnamed objects with custom construction and destruction (es.84).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::cpp_regex_traits_base&lt;char&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$cpp_regex_traits_base@D@re_detail_107100@boost@@QAE@ABVlocale@std@@@Z</DECORATED>
+    <FUNCLINE>176</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>d:\boost\boost_1_71_0\boost_root\boost\regex\v4</FILEPATH>
+      <FILENAME>perl_matcher.hpp</FILENAME>
+      <LINE>379</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::re_detail_107100::perl_matcher&lt;std::_String_const_iterator&lt;std::_String_val&lt;std::_Simple_types&lt;wchar_t&gt; &gt; &gt;,std::allocator&lt;boost::sub_match&lt;std::_String_const_iterator&lt;std::_String_val&lt;std::_Simple_types&lt;wchar_t&gt; &gt; &gt; &gt; &gt;,boost::regex_traits&lt;wchar_t,boost::w32_regex_traits&lt;wchar_t&gt; &gt; &gt;::m_stack_base' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::re_detail_107100::perl_matcher&lt;std::_String_const_iterator&lt;std::_String_val&lt;std::_Simple_types&lt;wchar_t&gt; &gt; &gt;,std::allocator&lt;boost::sub_match&lt;std::_String_const_iterator&lt;std::_String_val&lt;std::_Simple_types&lt;wchar_t&gt; &gt; &gt; &gt; &gt;,boost::regex_traits&lt;wchar_t,boost::w32_regex_traits&lt;wchar_t&gt; &gt; &gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$perl_matcher@V?$_String_const_iterator@V?$_String_val@U?$_Simple_types@_W@std@@@std@@@std@@V?$allocator@U?$sub_match@V?$_String_const_iterator@V?$_String_val@U?$_Simple_types@_W@std@@@std@@@std@@@boost@@@2@U?$regex_traits@_WV?$w32_regex_traits@_W@boost@@@boost@@@re_detail_107100@boost@@QAE@V?$_String_const_iterator@V?$_String_val@U?$_Simple_types@_W@std@@@std@@@std@@0AAV?$match_results@V?$_String_const_iterator@V?$_String_val@U?$_Simple_types@_W@std@@@std@@@std@@V?$allocator@U?$sub_match@V?$_String_const_iterator@V?$_String_val@U?$_Simple_types@_W@std@@@std@@@std@@@boost@@@2@@2@ABV?$basic_regex@_WU?$regex_traits@_WV?$w32_regex_traits@_W@boost@@@boost@@@2@W4_match_flags@regex_constants@2@0@Z</DECORATED>
+    <FUNCLINE>379</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT></DEFECTS>
