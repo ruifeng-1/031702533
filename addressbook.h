@@ -3,8 +3,55 @@
 #include <boost/regex.hpp>
 #include<fstream>
 #include <locale>
+#include<cstdlib>
+#include"cJSON.h"
 using namespace std;
 using namespace boost;
+
+std::string wstos(const std::wstring &ws)//宽字符串转换为字符串
+{
+	setlocale(LC_CTYPE, "");                                          
+	size_t convertNum;
+	size_t wsize = wcslen(ws.c_str());
+	size_t asize = wsize * 2 + 1;
+	char* str = (char*)malloc(asize * sizeof(char));
+	if (wcstombs_s(&convertNum, str, asize, ws.c_str(), asize))
+	{
+		cout << "转换失败" << endl;
+	}
+	std::string result = str;
+	delete[]str;
+	return result;
+}
+
+std::wstring stows(const std::string &s)//字符串转化为宽字符串
+{
+	setlocale(LC_CTYPE, "");
+	const char* _Source = s.c_str();
+	size_t _Dsize = s.size() + 1;
+	wchar_t* _Dest = new wchar_t[_Dsize];
+	size_t i;
+	mbstowcs_s(&i, _Dest, _Dsize, _Source, s.size());
+	std::wstring result = _Dest;
+	delete[] _Dest;
+	return result;
+}
+
+char* json_printf(string s)//字符串转化为json格式
+{
+	char* json = NULL;
+	cJSON* cjson = cJSON_Parse(s.c_str());
+	if (cjson == NULL)
+	{
+		cout << "json pack into cjson error..." << endl;
+	}
+	else
+	{
+		json = cJSON_Print(cjson);
+	}
+	cJSON_Delete(cjson);
+	return json;
+}
 
 class Text//文本类
 {
@@ -13,7 +60,7 @@ public:
 	wstring select_level(wstring s);
 	wstring find_name(wstring s);
 	wstring find_number(wstring s);
-	void show();
+	string returnText();
 	wstring Level();
 private:
 	wstring name;//姓名
@@ -60,7 +107,11 @@ wstring Text::find_number(wstring s)
 	else
 		cout << "find_number error" << endl;
 	size_t i = s.find_first_of(number);//查找手机号码所在位置
-	return address = s.substr(0, i) + s.substr(i + 11);//合并剩下的字符串
+	size_t flag = s.find('.');
+	if (i = flag-20)
+		return address = s.substr(0, i);//合并剩下的字符串
+	else
+		return address = s.substr(0, i) + s.substr(i + 11);
 }
 
 wstring Text::Level()
@@ -68,9 +119,11 @@ wstring Text::Level()
 	return level;
 }
 
-void Text::show()//输出姓名，手机号码
+string Text::returnText()//输出姓名，手机号码
 {
-	wcout << L"{\"姓名\":\"" << name << L"\"," << L"\"手机\":\"" << number << L"\",";
+	string Text = "{\"姓名\":\"" + wstos(name) + "\",\"手机\":\"" + wstos(number) + "\",";
+	//wcout << L"{\"姓名\":\"" << name << L"\"," << L"\"手机\":\"" << number << L"\",";
+	return Text;
 }
 
 class Address//地址类
@@ -80,7 +133,7 @@ public:
 	void find_address(wstring s);
 	wstring search_address(wstring wstr, wregex wre);
 	bool match_address(wstring wstr, wregex wre);
-	void show(wstring diff);
+	string returnAddress(wstring level);
 private:
 	wstring province;//省
 	wstring city;//市
@@ -135,10 +188,18 @@ bool Address::match_address(wstring wstr, wregex wre)// 正则表达式匹配
 		return false;
 }
 
-void Address::show(wstring diff)//输出地址
+string Address::returnAddress(wstring level)//输出地址
 {
-	if (diff == L"1!")
-		wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << house_number << detail << L"\"]}" << endl;
-	if (diff == L"2!")
-		wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << L"\",\"" << house_number << L"\",\"" << detail << L"\"]}" << endl;
+	string address;
+	if (level == L"1!")
+	{
+		address = "\"地址\":[\"" + wstos(province) + "\",\"" + wstos(city) + "\",\"" + wstos(county) + "\",\"" + wstos(town) + "\",\"" + wstos(road) + wstos(house_number) + wstos(detail) + "\"]}";
+		//wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << house_number << detail << L"\"]}" << endl;
+	}	
+	else
+	{
+		address = "\"地址\":[\"" + wstos(province) + "\",\"" + wstos(city) + "\",\"" + wstos(county) + "\",\"" + wstos(town) + "\",\"" + wstos(road) + "\",\"" + wstos(house_number) + "\",\"" + wstos(detail) + "\"]}";
+		//wcout << L"\"地址\":[\"" << province << L"\",\"" << city << L"\",\"" << county << L"\",\"" << town << L"\",\"" << road << L"\",\"" << house_number << L"\",\"" << detail << L"\"]}" << endl;
+	}	
+	return address;
 }

@@ -77,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\boost\boost_1_71_0\BOOST_ROOT</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>D:\boost\boost_1_71_0\BOOST_ROOT\bin.v2\libs;D:\boost\boost_1_71_0\BOOST_ROOT\stage\lib</AdditionalLibraryDirectories>
@@ -120,9 +121,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="addressbook.cpp" />
+    <ClCompile Include="cJSON.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addressbook.h" />
+    <ClInclude Include="cJSON.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
