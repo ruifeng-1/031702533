@@ -25,15 +25,15 @@ int main()
 	}*/
 	int count = 1;
 	ifstream ifs("input");
-	ofstream ofs("output.json");
+	ofstream ofs("031702533.txt");
 	string s;
 	Text text;
 	Address address;
 	setlocale(LC_CTYPE, "");
-	ifs.open("input.txt", ios::in);//¶ÁÎÄ¼þ´ò¿ª
+	ifs.open("input.txt", ios::in);//è¯»æ–‡ä»¶æ‰“å¼€
 	if (!ifs.is_open())
 	{
-		cout << "ÎÄ¼þ´ò¿ªÊ§°Ü£¡" << endl;
+		cout << "æ–‡ä»¶æ‰“å¼€å¤±è´¥ï¼" << endl;
 	}
 	ofs << "[" << endl;
 	while(getline(ifs, s))
