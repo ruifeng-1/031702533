@@ -2,214 +2,374 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<sstream>
+#include <Windows.h>
 #include"cardtype.h"
+#include"Enume.h"
+#include"HttpConn.h"
 #include"json/json.h"
-#include"include/curl/curl.h"
+#include"dataGet.h"
 using namespace std;
-typedef long long ll;
-pair<char, int> a[14] = { {'&',0 },{'&',2 },{'&',3 },{'&',4 },{'&',5 },{'&',6 }, {'*',13 } ,{'&',13 }, {'#',13 }, {'$',13 }, {'$',9 }, {'#',9 }, {'*',9 }, {'&',7} };//全局变量，牌组
-SimpleCardtype best1, best2, best3;//最优牌组
-Json::FastWriter writer;
-int ID;
-int max_weight = 0;//最大权值
-int i = 0, t1 = 0, t2 = 0;
 
-class Enume//枚举
-{
+map<int, string> status;
+
+class User {
 public:
-    SimpleCardtype front, mid, back;
-	void dfs1(vector<int> &p, int r, int n);
-	void dfs2(vector<int> &p, int r, int n);
-	void dfs3(vector<int> &p, int r, int n);
-	vector<pair<char, int> > choose;
-	void best_choose();
+	int user_id;
+	string token;
+	bool logined;
+	User() {
+		logined = false;
+	}
 };
 
-void Enume::dfs1(vector<int> &p, int r, int n) {
-	for (ll s = (1 << r) - 1; s < 1 << n;) {
-        t1 = s;
-		choose.clear();
-		vector<int> cur = p;
-		for (int j = n - 1; j >= 0; j--) {
-			if (((s >> j) & 1)) choose.push_back(a[p[j]]), cur.erase(cur.begin() + j, cur.begin() + j + 1);
+class Menu {
+public:
+	HttpConn http;
+	DataGet dt;
+	User user;
+	Enume enume;
+	Menu() {
+		http.host = "http://api.revth.com";
+		status[0] = "成功";
+		status[1] = "服务器无回应";
+		status[1001] = "用户名已被使用";
+		status[1002] = "学号已绑定";
+		status[1003] = "教务处认证失败";
+		status[1004] = "Token过期";
+		status[1005] = "用户名或密码错误";
+		status[2001] = "未结束战局过多";
+		status[2002] = "出千！！！";
+		status[2003] = "不合法墩牌";
+		status[2004] = "战局不存在或已结束";
+		status[2005] = "格式错误";
+		status[2006] = "超时";
+		status[3001] = "战局不存在或未结束";
+		status[3002] = "玩家不存在";
+		status[5000] = "请看具体报错，大概率是传入参数问题";
+	}
+	void showRank() {
+		Json::Reader reader;
+		Json::Value input;
+		int re = http.ope("/rank", "rank", "GET", "", "");
+		if (re) {
+			cout << re << "服务器无回应"<< endl;
+			return;
 		}
-		back.init(choose);
-		dfs2(cur, 5, 8);
-		ll x = s & -s;
-		ll y = s + x;
-		s = ((s&~y) / x >> 1) | y;
-	}
-}
-
-void Enume::dfs2(vector<int> &p, int r, int n) {
-	for (ll s = (1 << r) - 1; s < 1 << n;) {
-	    t2 = s;
-		choose.clear();
-		vector<int> cur = p;
-		for (int j = n - 1; j >= 0; j--) {
-			if (((s >> j) & 1)) choose.push_back(a[p[j]]), cur.erase(cur.begin() + j, cur.begin() + j + 1);
+		reader.parse(dt.getRank(), input);
+		cout << "            玩家id           分数            昵称    " << endl;
+		for (int i = 0; i < input.size(); i++) {
+			printf("%16d %16d %16s\n", input[i]["player_id"].asInt(), input[i]["score"].asInt(), input[i]["name"].asCString());
 		}
-		mid.init(choose);
-		ll x = s & -s;
-		ll y = s + x;
-		s = ((s&~y) / x >> 1) | y;
-		if(mid.weight > back.weight) continue;
-		dfs3(cur, 3, 3);
 	}
-}
-
-void Enume::dfs3(vector<int> &p, int r, int n) {
-	choose.clear();
-	for (int j = 0; j < n; j++) {
-		choose.push_back(a[p[j]]);
+	Json::Value login(const string& username, const string& password) {
+		Json::Value post;
+		post["username"] = username;
+		post["password"] = password;
+		int re = http.ope("/auth/login", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	front.init(choose);
-	if(front.weight > mid.weight) return ;
-	best_choose();
-}
-
-void Enume::best_choose()//权值
-{
-    int weight = front.weight + mid.weight + back.weight;
-    if (weight > max_weight)
-    {
-        max_weight = weight;
-        best1 = front;
-        best2 = mid;
-        best3 = back;
-    }
-}
-
-void input_best()//出牌测试
-{
-	for (auto x : best1.poker) {
-		cout << x.first << x.second << " ";
+	Json::Value reg(const string& username, const string& password) {
+		Json::Value post;
+		post["username"] = username;
+		post["password"] = password;
+		int re = http.ope("/auth/register", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-	for (auto x : best2.poker) {
-		cout << x.first << x.second << " ";
+	Json::Value regAndBind(const string& username, const string& password, const string& student_number, const string& student_password) {
+		Json::Value post;
+		post["username"] = username;
+		post["password"] = password;
+		post["student_number"] = student_number;
+		post["student_password"] = student_password;
+		int re = http.ope("/auth/register2", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-	for (auto x : best3.poker) {
-		cout << x.first << x.second << " ";
+	Json::Value logout() {
+		Json::Value ret;
+		int re = http.ope("/auth/logout", "status", "POST", "X-Auth-Token: \"" + user.token + "\"\r\n", "");
+		if (re) {
+			cout << re;
+			ret["status"] = 1;
+			return ret;
+		}
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-}
-
-SimpleCardtype transform(SimpleCardtype best1)//转换
-{
-	for (int i = 0; i < best1.poker.size(); i++)
-	{
-		string str = "0";
-		str[0] = best1.poker[i].first;
-		if (best1.poker[i].second < 10)
-			best1.input.push_back(str + to_string(best1.poker[i].second));
-		else if (best1.poker[i].second == 11)
-			best1.input.push_back(str + "J");
-		else if (best1.poker[i].second == 12)
-			best1.input.push_back(str + "Q");
-		else if (best1.poker[i].second == 13)
-			best1.input.push_back(str + "K");
-		else if (best1.poker[i].second == 14) 
-			best1.input.push_back(str + "A");
+	Json::Value bind(const string& student_number, const string& student_password) {
+		Json::Value post;
+		post["student_number"] = student_number;
+		post["student_password"] = student_password;
+		int re = http.ope("/auth/bind", "status", "POST", "X-Auth-Token: \"" + user.token + "\",Content-Type: application/json\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	return best1;
-}
-
-void input_best_2()
-{
-	best1 = transform(best1);
-	best2 = transform(best2);
-	best3 = transform(best3);
-	for (auto x : best1.input) {
-		cout << x << " ";
+	Json::Value start() {
+		Json::Value ret;
+		int re = http.ope("/game/open", "status", "POST", "X-Auth-Token: " + user.token + "\r\n", "");
+		if (re) {
+			cout << re;
+			ret["status"] = 1;
+			return ret;
+		}
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-	for (auto x : best2.input) {
-		cout << x << " ";
+	Json::Value submit(const Json::Value& post) {
+		Json::Value ret;
+		int re = http.ope("/game/submit", "status", "POST", "X-Auth-Token: " + user.token + ",Content-Type: application/json\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			ret["status"] = 1;
+			return ret;
+		}
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-	for (auto x : best3.input) {
-		cout << x << " ";
+	Json::Value history(const int& limit, const int& page) {
+		Json::Value post;
+		post["player_id"] = user.user_id;
+		post["limit"] = limit;
+		post["page"] = page;
+		int re = http.ope("/history", "status", "GET", "X-Auth-Token: \"" + user.token + "\"\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	cout << endl;
-}
-
-Json::Value data_to_json(SimpleCardtype best1, SimpleCardtype best2, SimpleCardtype best3,int ID)
-{
-	string str;
-	Json::Value data;
-	data["id"] = Json::Value(ID);
-	str = best1.input[0];
-	for (int i = 1; i < best1.input.size(); i++)
-	{
-		str += " " + best1.input[i];
+	Json::Value historyDetail(const string& id) {
+		Json::Value post;
+		int re = http.ope("/history/" + id, "status", "GET", "X-Auth-Token: " + user.token + "\r\n", post.toStyledString());
+		if (re) {
+			cout << re;
+			post["status"] = 1;
+			return post;
+		}
+		Json::Value ret;
+		Json::Reader reader;
+		reader.parse(dt.getStatus(), ret);
+		return ret;
 	}
-	data["card"].append(str);
-	str = best2.input[0];
-	for (int i = 1; i < best2.input.size(); i++)
-	{
-		str += " " + best2.input[i];
+	void showLogin() {
+		cout << "1. 注册" << endl;
+		cout << "2. 注册并绑定学号" << endl;
+		cout << "3. 登录" << endl;
+		cout << "0. 退出" << endl;
+		cout << "请输入操作序号:";
 	}
-	data["card"].append(str);
-	str = best3.input[0];
-	for (int i = 1; i < best3.input.size(); i++)
-	{
-		str += " " + best3.input[i];
-	}
-	data["card"].append(str);
-	cout << writer.write(data) << endl;
-	return data;
-}
-
-void json_to_data(Json::Value data)
-{
-	string str;
-	str = writer.write(data["id"]);//解析ID
-	ID = atoi(str.c_str());//保存ID
-	str = writer.write(data["card"]);//解析牌组
-	int k = 1;
-	for (int i = 0; i < str.size(); i++)
-	{
-		if (str[i] == ' ')
+	void loginMenu() {
+		system("cls");
+		showLogin();
+		Json::FastWriter writer;
+		int opt;
+		string _a, _b, _c, _d;
+		Json::Value res;
+		cin >> opt;
+		system("cls");
+		switch (opt)
+		{
+		case 0:
+			exit(0);
 			break;
-		a[k].first = str[i++];
-		if (str[i] >= '2'&&str[i] <= '9')
-		{
-			if (str[i] != '1')
-				a[k++].second = str[i] - '0';
-			else
-			{
-				a[k++].second = 10;
-				i++;
+		case 1:
+			cout << "请输入注册账号:";
+			cin >> _a;
+			cout << "请输入密码:";
+			cin >> _b;
+			res = reg(_a, _b);
+			cout << status[res["status"].asInt()] << endl;
+			break;
+		case 2:
+			cout << "请输入注册账号:";
+			cin >> _a;
+			cout << "请输入密码:";
+			cin >> _b;
+			cout << "请输入学号:";
+			cin >> _c;
+			cout << "请输入密码:";
+			cin >> _d;
+			res = regAndBind(_a, _b, _c, _d);
+			cout << status[res["status"].asInt()] << endl;
+			break;
+		case 3:
+			cout << "请输入账号:";
+			cin >> _a;
+			cout << "请输入密码:";
+			cin >> _b;
+			res = login(_a, _b);
+			cout << status[res["status"].asInt()] << endl;
+			if (res["status"].asInt() == 0) {
+				user.user_id = res["data"]["user_id"].asInt();
+				user.token = res["data"]["token"].asString();
+				user.logined = true;
 			}
+			break;
+		default:
+			break;
 		}
-		else
-		{
-			if (str[i] == 'J')
-				a[k++].second = 11;
-			if (str[i] == 'Q')
-				a[k++].second = 12;
-			if (str[i] == 'K')
-				a[k++].second = 13;
-			if (str[i] == 'A')
-				a[k++].second = 14;
-		}
+		system("pause");
 	}
-}
+	void showMain() {
+		cout << "我的token:" << user.token << endl;
+		cout << "我的id:" << user.user_id << endl;
+		cout << "1. 注销" << endl;
+		cout << "2. 绑定" << endl;
+		cout << "3. 开启战局" << endl;
+		cout << "4. 排行榜" << endl;
+		cout << "5. 历史战局" << endl;
+		cout << "6. 历史战局详情" << endl;
+		cout << "0. 退出" << endl;
+		cout << "请输入操作序号:";
+	}
+	vector<pair<char, int> > jsonToPoker(const Json::Value& jso) {
+		vector<pair<char, int> > ret;
+		ret.push_back({ '0', 0 });
+		string card = jso["data"]["card"].asString();
+		stringstream st;
+		st << card;
+		string cur;
+		while (st >> cur) {
+			int val;
+			if (cur.size() == 3) val = 10;
+			else if (cur[1] == 'J') val = 11;
+			else if (cur[1] == 'Q') val = 12;
+			else if (cur[1] == 'K') val = 13;
+			else if (cur[1] == 'A') val = 14;
+			else val = cur[1] - '0';
+			ret.push_back({ cur[0], val });
+		}
+		return ret;
+	}
+	Json::Value pokerToJson(SimpleCardtype best[]) {
+		Json::Value ret;
+		for (int i = 1; i <= 3; i++) {
+			string cur;
+			for (int j = 0; j < best[i].poker.size(); j++) {
+				if (j) cur.push_back(' ');
+				cur.push_back(best[i].poker[j].first);
+				if (best[i].poker[j].second == 10) cur += "10";
+				else if (best[i].poker[j].second == 11) cur.push_back('J');
+				else if (best[i].poker[j].second == 12) cur.push_back('Q');
+				else if (best[i].poker[j].second == 13) cur.push_back('K');
+				else if (best[i].poker[j].second == 14) cur.push_back('L');
+				else cur.push_back(best[i].poker[j].second + '0');
+			}
+			ret["card"].append(cur);
+		}
+		return ret;
+	}
+	void mainMenu() {
+		system("cls");
+		showMain();
+		int opt, tmpid, _ia, _ib;
+		Json::FastWriter writer;
+		Json::Value res;
+		string _a, _b, _c, _d;
+		vector<pair<char, int> > tmp;
+		cin >> opt;
+		system("cls");
+		switch (opt)
+		{
+		case 0:
+			exit(0);
+			break;
+		case 1:
+			res = logout();
+			cout << status[res["status"].asInt()] << endl;
+			if (res["status"].asInt() == 0) user.logined = false;
+			break;
+		case 2:
+			cout << "请输入学号:";
+			cin >> _a;
+			cout << "请输入密码:";
+			cin >> _b;
+			res = bind(_a, _b);
+			cout << status[res["status"].asInt()] << endl;
+			break;
+		case 3:
+			res = start();
+			cout << status[res["status"].asInt()] << endl;
+			tmpid = res["data"]["id"].asInt();
+			cout << writer.write(res) << endl;
+			tmp = jsonToPoker(res);
+			enume.clear(tmp);
+			res = pokerToJson(enume.best);
+			res["id"] = tmpid;
+			cout << writer.write(res) << endl;
+			res = submit(res);
+			break;
+		case 4:
+			showRank();
+			break;
+		case 5:
+			cout << "每页显示数量:";
+			cin >> _ia;
+			cout << "第几页:";
+			cin >> _ib;
+			res = history(_ia, _ib);
+			cout << status[res["status"].asInt()] << endl;
+			cout << "     战局id    前墩      中墩      后墩      得分     结算时间" << endl;
+			cout << writer.write(res) << endl;
+			break;
+		case 6:
+			cout << "输入战局id:";
+			cin >> _a;
+			res = historyDetail(_a);
+			cout << status[res["status"].asInt()] << endl;
+			cout << writer.write(res) << endl;
+			break;
+		default:
+			break;
+		}
+		system("pause");
+	}
+};
 
 int main() {
-	vector<int> p;
-	Enume enume;
-	for (int i = 1; i <= 13; i++)
-		cout << a[i].first << a[i].second << " ";
-	cout << endl;
-	for (int i = 1; i <= 13; i++)
-		p.push_back(i);
-	enume.dfs1(p, 5, 13);
-	input_best();//输出测试1
-	input_best_2();//输出测试2
-	Json::Value data = data_to_json(best1, best2, best3, 1001);
+	Menu menu;
+	while (true) {
+		if (menu.user.logined) menu.mainMenu();
+		else menu.loginMenu();
+	}
 	system("pause");
-    return 0;
+	return 0;
 }

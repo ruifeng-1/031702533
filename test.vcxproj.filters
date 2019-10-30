@@ -18,9 +18,30 @@
     <ClInclude Include="cardtype.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Enume.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpConn.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dataGet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cardtype.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Enume.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpConn.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DataGet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
