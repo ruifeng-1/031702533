@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<queue>
 #include<sstream>
 #include <Windows.h>
 #include"cardtype.h"
@@ -17,6 +18,8 @@ class User {
 public:
 	int user_id;
 	string token;
+	string username;
+	string password;
 	bool logined;
 	User() {
 		logined = false;
@@ -66,7 +69,7 @@ public:
 		Json::Value post;
 		post["username"] = username;
 		post["password"] = password;
-		int re = http.ope("/auth/login", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		int re = http.ope("/auth/login", "status", "POST", "Content-Type: application/json", post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -81,7 +84,7 @@ public:
 		Json::Value post;
 		post["username"] = username;
 		post["password"] = password;
-		int re = http.ope("/auth/register", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		int re = http.ope("/auth/register", "status", "POST", "Content-Type: application/json", post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -98,7 +101,7 @@ public:
 		post["password"] = password;
 		post["student_number"] = student_number;
 		post["student_password"] = student_password;
-		int re = http.ope("/auth/register2", "status", "POST", "Content-Type: application/json\r\n", post.toStyledString());
+		int re = http.ope("/auth/register2", "status", "POST", "Content-Type: application/json", post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -111,7 +114,7 @@ public:
 	}
 	Json::Value logout() {
 		Json::Value ret;
-		int re = http.ope("/auth/logout", "status", "POST", "X-Auth-Token: \"" + user.token + "\"\r\n", "");
+		int re = http.ope("/auth/logout", "status", "POST", "X-Auth-Token:" + user.token, "");
 		if (re) {
 			cout << re;
 			ret["status"] = 1;
@@ -125,7 +128,7 @@ public:
 		Json::Value post;
 		post["student_number"] = student_number;
 		post["student_password"] = student_password;
-		int re = http.ope("/auth/bind", "status", "POST", "X-Auth-Token: \"" + user.token + "\",Content-Type: application/json\r\n", post.toStyledString());
+		int re = http.ope("/auth/bind", "status", "POST", "X-Auth-Token:" + user.token + "\r\nContent-Type: application/json\r\n", post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -138,7 +141,7 @@ public:
 	}
 	Json::Value start() {
 		Json::Value ret;
-		int re = http.ope("/game/open", "status", "POST", "X-Auth-Token: " + user.token + "\r\n", "");
+		int re = http.ope("/game/open", "status", "POST", "X-Auth-Token: " + user.token, "");
 		if (re) {
 			cout << re;
 			ret["status"] = 1;
@@ -150,7 +153,7 @@ public:
 	}
 	Json::Value submit(const Json::Value& post) {
 		Json::Value ret;
-		int re = http.ope("/game/submit", "status", "POST", "X-Auth-Token: " + user.token + ",Content-Type: application/json\r\n", post.toStyledString());
+		int re = http.ope("/game/submit", "status", "POST", "X-Auth-Token: " + user.token + "\r\nContent-Type: application/json\r\n", post.toStyledString());
 		if (re) {
 			cout << re;
 			ret["status"] = 1;
@@ -165,7 +168,7 @@ public:
 		post["player_id"] = user.user_id;
 		post["limit"] = limit;
 		post["page"] = page;
-		int re = http.ope("/history", "status", "GET", "X-Auth-Token: \"" + user.token + "\"\r\n", post.toStyledString());
+		int re = http.ope("/history", "status", "GET", "X-Auth-Token: " + user.token, post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -178,7 +181,7 @@ public:
 	}
 	Json::Value historyDetail(const string& id) {
 		Json::Value post;
-		int re = http.ope("/history/" + id, "status", "GET", "X-Auth-Token: " + user.token + "\r\n", post.toStyledString());
+		int re = http.ope("/history/" + id, "status", "GET", "X-Auth-Token: " + user.token, post.toStyledString());
 		if (re) {
 			cout << re;
 			post["status"] = 1;
@@ -235,6 +238,8 @@ public:
 			cin >> _a;
 			cout << "请输入密码:";
 			cin >> _b;
+			user.username = _a;
+			user.password = _b;
 			res = login(_a, _b);
 			cout << status[res["status"].asInt()] << endl;
 			if (res["status"].asInt() == 0) {
@@ -249,7 +254,6 @@ public:
 		system("pause");
 	}
 	void showMain() {
-		cout << "我的token:" << user.token << endl;
 		cout << "我的id:" << user.user_id << endl;
 		cout << "1. 注销" << endl;
 		cout << "2. 绑定" << endl;
@@ -257,6 +261,7 @@ public:
 		cout << "4. 排行榜" << endl;
 		cout << "5. 历史战局" << endl;
 		cout << "6. 历史战局详情" << endl;
+		cout << "7. 自动战斗" << endl;
 		cout << "0. 退出" << endl;
 		cout << "请输入操作序号:";
 	}
@@ -290,7 +295,7 @@ public:
 				else if (best[i].poker[j].second == 11) cur.push_back('J');
 				else if (best[i].poker[j].second == 12) cur.push_back('Q');
 				else if (best[i].poker[j].second == 13) cur.push_back('K');
-				else if (best[i].poker[j].second == 14) cur.push_back('L');
+				else if (best[i].poker[j].second == 14) cur.push_back('A');
 				else cur.push_back(best[i].poker[j].second + '0');
 			}
 			ret["card"].append(cur);
@@ -300,7 +305,8 @@ public:
 	void mainMenu() {
 		system("cls");
 		showMain();
-		int opt, tmpid, _ia, _ib;
+		int opt, tmpid, _ia, _ib, score, time;
+		queue<string> fight;
 		Json::FastWriter writer;
 		Json::Value res;
 		string _a, _b, _c, _d;
@@ -327,15 +333,20 @@ public:
 			break;
 		case 3:
 			res = start();
-			cout << status[res["status"].asInt()] << endl;
+			cout << "获取牌:" << status[res["status"].asInt()] << endl;
+			if (res["status"].asInt() == 0) {
+				cout << "战局id:" << res["data"]["id"] << endl;
+				cout << "拿牌:" << res["data"]["card"] << endl;
+			}
+			else break;
 			tmpid = res["data"]["id"].asInt();
-			cout << writer.write(res) << endl;
 			tmp = jsonToPoker(res);
 			enume.clear(tmp);
 			res = pokerToJson(enume.best);
 			res["id"] = tmpid;
-			cout << writer.write(res) << endl;
+			cout << "出牌:" << res["card"] << endl;
 			res = submit(res);
+			cout << "提交牌:" << status[res["status"].asInt()] << endl;
 			break;
 		case 4:
 			showRank();
@@ -347,15 +358,86 @@ public:
 			cin >> _ib;
 			res = history(_ia, _ib);
 			cout << status[res["status"].asInt()] << endl;
-			cout << "     战局id    前墩      中墩      后墩      得分     结算时间" << endl;
-			cout << writer.write(res) << endl;
+			if (res["status"].asInt() == 0) {
+				cout << "     战局id    前墩      中墩      后墩      得分     结算时间" << endl;
+			}
 			break;
 		case 6:
 			cout << "输入战局id:";
 			cin >> _a;
 			res = historyDetail(_a);
 			cout << status[res["status"].asInt()] << endl;
-			cout << writer.write(res) << endl;
+			if (res["status"].asInt() == 0) {
+				cout << "时间:" << res["data"]["timestamp"].asInt() << endl;
+				cout << "      id                玩家        分数    出牌" << endl;
+				for (int i = 0; i < 4; i++) {
+					printf("%8d%20s%10d     ", res["data"]["detail"][i]["player_id"].asInt(), res["data"]["detail"][i]["name"].asCString(), res["data"]["detail"][i]["score"].asInt());
+					cout << res["data"]["detail"][i]["card"] << endl;
+				}
+			}
+			break;
+		case 7:
+			cout << "输入对局数(-1为无限次):";
+			cin >> _ia;
+			while (_ia--) {
+				score = 0;
+				time = 0;
+				res = start();
+				cout << "获取牌:" << status[res["status"].asInt()] << endl;
+				if (res["status"].asInt() == 0) {
+					cout << "战局id:" << res["data"]["id"] << endl;
+					cout << "拿牌:" << res["data"]["card"] << endl;
+				}
+				else break;
+				tmpid = res["data"]["id"].asInt();
+				tmp = jsonToPoker(res);
+				enume.clear(tmp);
+				res = pokerToJson(enume.best);
+				res["id"] = tmpid;
+				cout << "出牌:" << res["card"] << endl;
+				res = submit(res);
+				cout << "提交牌:" << status[res["status"].asInt()] << endl;
+				_a.clear();
+				while (tmpid) {
+					_a.push_back(tmpid % 10 + '0');
+					tmpid /= 10;
+				}
+				reverse(_a.begin(), _a.end());
+				Sleep(1000);
+				fight.push(_a);
+				while (true) {
+					if (fight.empty()) break;
+					res = historyDetail(fight.front());
+					if (res["status"].asInt() != 0) break;
+					fight.pop();
+					cout << "时间:" << res["data"]["timestamp"].asInt() << endl;
+					cout << "      id                玩家        分数    出牌" << endl;
+					for (int i = 0; i < 4; i++) {
+						printf("%8d%20s%10d     ", res["data"]["detail"][i]["player_id"].asInt(), res["data"]["detail"][i]["name"].asCString(), res["data"]["detail"][i]["score"].asInt());
+						cout << res["data"]["detail"][i]["card"] << endl;
+						if (res["data"]["detail"][i]["player_id"].asInt() == user.user_id) score += res["data"]["detail"][i]["score"].asInt(), time++;
+					}
+				}
+			}
+			while (fight.size()) {
+				cout << "正在等待之前对战结果请稍后……" << endl;
+				res = historyDetail(fight.front());
+				if (res["status"].asInt() != 0) {
+					Sleep(1000);
+					continue;
+				}
+				fight.pop();
+				cout << "时间:" << res["data"]["timestamp"].asInt() << endl;
+				cout << "      id                玩家        分数    出牌" << endl;
+				for (int i = 0; i < 4; i++) {
+					printf("%8d%20s%10d     ", res["data"]["detail"][i]["player_id"].asInt(), res["data"]["detail"][i]["name"].asCString(), res["data"]["detail"][i]["score"].asInt());
+					cout << res["data"]["detail"][i]["card"] << endl;
+					if (res["data"]["detail"][i]["player_id"].asInt() == user.user_id) score += res["data"]["detail"][i]["score"].asInt(), time++;
+				}
+			}
+			cout << "共经历" << time << "次对局  共得分: " << score << "      平均每局得分:";
+			if (time) cout << score * 1.0 / time << endl;
+			else cout << 0 << endl;
 			break;
 		default:
 			break;

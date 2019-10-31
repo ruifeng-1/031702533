@@ -1,8 +1,6 @@
 #pragma once
 #include<string>
 #include <iostream>
-#include <windows.h>
-#include <wininet.h>
 
 class HttpConn {
 public:

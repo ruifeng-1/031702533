@@ -14,19 +14,21 @@ int SimpleCardtype::judge_cardtype()//ÅÐ¶ÏÅÆÐÍ
 	if (poker.size() == 5)
 	{
 		if (sameColor && straight)
-			return 8;
+			return 9;
 		if (type[4])
-			return 7;
+			return 8;
 		if (type[3] && type[2])
-			return 6;
+			return 7;
 		if (sameColor)
-			return 5;
+			return 6;
 		if (straight)
-			return 4;
+			return 5;
 		if (type[3])
-			return 3;
-		if (type[2] >= 2)
+			return 4;
+		if (type[2] >= 2) {
+			if (tmp[0].second == tmp[1].second + 1 || tmp[0].second == tmp[1].second - 1) return 3;
 			return 2;
+		}
 		if (type[2])
 			return 1;
 		return 0;
@@ -68,8 +70,8 @@ void SimpleCardtype::init(vector<pair<char, int> > & choose) {
 	swap(choose, poker);
 	fill(type, type + 11, 0);
 	sort(poker.begin(), poker.end(), cmp);
-	vector<pair<int, int> > tmp;
-	for (int i = 0; i <= 13; i++) tmp.push_back({ 0, i });
+	tmp.clear();
+	for (int i = 0; i <= 14; i++) tmp.push_back({ 0, i });
 	for (int i = 0; i < poker.size(); i++)
 		tmp[poker[i].second].first++;
 	sort(tmp.begin(), tmp.end(), greater<pair<int, int> >());

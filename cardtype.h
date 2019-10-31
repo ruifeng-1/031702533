@@ -12,6 +12,7 @@ public:
 	SimpleCardtype();
 	SimpleCardtype(vector<pair<char, int> >& choose);
 	vector<pair<char, int> > poker; // 该墩扑克
+	vector<pair<int, int> > tmp;// 排序后的扑克
 	int type[11];// 该墩扑克张数组成
 	bool sameColor, straight;// 是否是同花，顺子
 	int weight;// 该墩评分

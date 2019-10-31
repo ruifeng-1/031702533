@@ -4,7 +4,7 @@ using namespace std;
 
 Enume::Enume(){}
 Enume::Enume(vector<pair<char, int> > &_a){
-	swap(poker, _a);
+	poker = _a;
 }
 
 void Enume::clear(vector<pair<char, int> >& _a) {

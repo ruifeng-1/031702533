@@ -1,6 +1,9 @@
 #include"HttpConn.h"
 #include "json/json.h"
 #include <fstream>
+#include <sstream>
+#include <windows.h>
+#include <wininet.h>
 #pragma comment(lib, "Wininet.lib")
 #include <tchar.h>
 using namespace std;
@@ -52,14 +55,24 @@ int HttpConn::ope(const std::string &path, const std::string &fileN,const std::s
 		delete[]pst;
 		return -3;
 	}
-
+	stringstream ss;
+	string tmp;
+	ss << headers;
+	while (getline(ss, tmp)) {
+		if (!HttpAddRequestHeadersA(hHttpRequest, tmp.c_str(), tmp.length(), HTTP_ADDREQ_FLAG_ADD)) {
+			InternetCloseHandle(hHttpRequest);
+			InternetCloseHandle(hHttpSession);
+			InternetCloseHandle(hInternet);
+			delete[]pst;
+			return -5;
+		}
+	}
 	/**
 	 * 查询http状态码（这一步不是必须的）,但是HttpSendRequest()必须要调用
 	 */
-
 	DWORD dwRetCode = 0;
 	DWORD dwSizeOfRq = sizeof(DWORD);
-	if (!HttpSendRequest(hHttpRequest, headers.c_str(), headers.size(), pst, _post.size()))
+	if (!HttpSendRequest(hHttpRequest, NULL, NULL, pst, _post.size()))
 	{
 		InternetCloseHandle(hHttpRequest);
 		InternetCloseHandle(hHttpSession);
